@@ -32,15 +32,34 @@ def main():
 	parser.add_option("-o", "--output", dest="output", default="ascii",
 		help="Render output: ascii [default], pil")
 
+	parser.add_option("-s", "--size", dest="size",
+		help="Set render size: hxw Example: 320x240")
+
 	parser.add_option("-p", "--profile", dest="profile", action="store_true",
 		default=False, help="Run profiler and output result to" + profile_file)
 
 	(options, args) = parser.parse_args()
 
+	width = None
+	height = None
+	if options.size:
+		try:
+			width, height = [int(x) for x in options.size.split("x")]
+		except:
+			print "Unknown size format '%s'" % (options.size)
+			parser.print_help()
+			sys.exit(1)
+
 	if options.output == "pil":
-		screen = traceylib.screen.PILImageScreen(320, 240)
+		if not width:
+			width = 320
+			height = 240
+		screen = traceylib.screen.PILImageScreen(width, height)
 	elif options.output == "ascii":
-		screen = traceylib.screen.TextScreen(80, 25)
+		if not width:
+			width = 80
+			height = 25
+		screen = traceylib.screen.TextScreen(width, height)
 	else:
 		print "Unknown output format '%s'" % (options.output)
 		parser.print_help()
